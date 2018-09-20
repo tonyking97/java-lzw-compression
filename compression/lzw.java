@@ -2,59 +2,57 @@ package compression;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class lzw {
     public lzw(){}
-    public String lzw_compress(String s){
-        HashMap<String,Integer> dict = new HashMap<>();
-        String[] data = (s + "").split("");
+
+    public String lzw_compress(String input){
+        HashMap<String,Integer> dictionary = new LinkedHashMap<>();
+        String[] data = (input + "").split("");
         String out = "";
-        ArrayList<String> out2 = new ArrayList<>();
-        String currChar;
+        ArrayList<String> temp_out = new ArrayList<>();
+        String currentChar;
         String phrase = data[0];
         int code = 256;
         for(int i=1; i<data.length;i++){
-            currChar = data[i];
-            if(dict.get(phrase+currChar) != null){
-                phrase += currChar;
+            currentChar = data[i];
+            if(dictionary.get(phrase+currentChar) != null){
+                phrase += currentChar;
             }
             else{
                 if(phrase.length() > 1){
-                    out = Character.toString((char)dict.get(phrase).intValue());
-                    out2.add(out);
+                    temp_out.add(Character.toString((char)dictionary.get(phrase).intValue()));
                 }
                 else{
-                    out = Character.toString((char)Character.codePointAt(phrase,0));
-                    out2.add(out);
+                    temp_out.add(Character.toString((char)Character.codePointAt(phrase,0)));
                 }
 
-                dict.put(phrase+currChar,code);
+                dictionary.put(phrase+currentChar,code);
                 code++;
-                phrase = currChar;
+                phrase = currentChar;
             }
         }
 
         if(phrase.length() > 1){
-            out = Character.toString((char)dict.get(phrase).intValue());
-            out2.add(out);
+            temp_out.add(Character.toString((char)dictionary.get(phrase).intValue()));
         }
         else{
-            out = Character.toString((char)Character.codePointAt(phrase,0));
-            out2.add(out);
+            temp_out.add(Character.toString((char)Character.codePointAt(phrase,0)));
         }
-        out="";
-        for(String outchar:out2){
+
+        for(String outchar:temp_out){
             out+=outchar;
         }
         return out;
     }
 
-    public String lzw_extract(String s){
-        HashMap<Integer,String> dict = new HashMap<>();
-        String[] data = (s + "").split("");
-        String currChar = data[0];
-        String oldPhrase = currChar;
-        String out = currChar;
+    public String lzw_extract(String input){
+        HashMap<Integer,String> dictionary = new LinkedHashMap<>();
+        String[] data = (input + "").split("");
+        String currentChar = data[0];
+        String oldPhrase = currentChar;
+        String out = currentChar;
         int code = 256;
         String phrase="";
         for(int i=1;i<data.length;i++){
@@ -63,16 +61,16 @@ public class lzw {
                 phrase = data[i];
             }
             else{
-                if(dict.get(currCode) != null){
-                    phrase = dict.get(currCode);
+                if(dictionary.get(currCode) != null){
+                    phrase = dictionary.get(currCode);
                 }
                 else{
-                    phrase = oldPhrase + currChar;
+                    phrase = oldPhrase + currentChar;
                 }
             }
             out+=phrase;
-            currChar = phrase.substring(0,1);
-            dict.put(code,oldPhrase+currChar);
+            currentChar = phrase.substring(0,1);
+            dictionary.put(code,oldPhrase+currentChar);
             code++;
             oldPhrase = phrase;
         }
